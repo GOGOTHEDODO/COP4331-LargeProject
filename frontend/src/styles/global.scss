@@ -1,0 +1,53 @@
+// Reset styles
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  // Root variables
+  :root {
+    --primary-color: #2a9d8f;
+    --secondary-color: #264653;
+    --accent-color: #f4a261;
+    --text-color: #e9c46a;
+    --background-color: #f4f4f4;
+    --font-family: 'Arial', sans-serif;
+  }
+  
+  // Global typography
+  body {
+    font-family: var(--font-family);
+    line-height: 1.6;
+    background-color: var(--background-color);
+    color: var(--secondary-color);
+  }
+  
+  // Utility classes
+  .text-center {
+    text-align: center;
+  }
+  
+  .mt-1 {
+    margin-top: 1rem;
+  }
+  
+  .mt-2 {
+    margin-top: 2rem;
+  }
+  
+  .mb-1 {
+    margin-bottom: 1rem;
+  }
+  
+  .mb-2 {
+    margin-bottom: 2rem;
+  }
+  
+  body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Prevent scrolling */
+    height: 100%; /* Ensure full height for flexbox centering */
+  }
+  
