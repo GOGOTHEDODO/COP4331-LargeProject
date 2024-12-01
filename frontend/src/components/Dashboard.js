@@ -57,19 +57,60 @@ const HomePage = () => {
     }
   };
 
-  const handleStartWorkout = () => {
+  const handleStartWorkout = async (e) => {
+    e.preventDefault();
     setWorkoutInProgress(true);
     setWorkoutStartTime(new Date());
     setExercises([]);
     setNotes("");
+
+    var obj = {setName:"NewWeightTraining", exercises:exercises, userId:JSON.parse(localStorage.getItem('user_data')).id}; 
+    var js = JSON.stringify(obj);
+
+    try {
+      const response = await fetch('http://localhost:5000/api/create-set', {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
+
+      var res = JSON.parse(await response.text());
+
+      if (res.error.length <= 0) {
+        // Workout/set successfully created
+      }
+      else {
+        alert(res.error);
+      }
+    }
+    catch {
+      alert(e.toString);
+    }
   };
 
-  const handleCancelWorkout = () => {
+  const handleCancelWorkout = async (e) => {
+    e.preventDefault();
     if (window.confirm("Are you sure you want to cancel this workout? All progress will be lost.")) {
       setWorkoutInProgress(false);
       setExercises([]);
       setWorkoutStartTime(new Date());
       setNotes("");
+
+      var obj = {setName:"NewWeightTraining"}; 
+      var js = JSON.stringify(obj);
+
+      try {
+        const response = await fetch('http://localhost:5000/api/delete-set', {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
+  
+        var res = JSON.parse(await response.text());
+  
+        if (res.error.length <= 0) {
+          // Workout/set successfully deleted
+          alert(res.message);
+        }
+        else {
+          alert(res.error);
+        }
+      }
+      catch {
+        alert(e.toString);
+      }
     }
   };
 
@@ -86,16 +127,16 @@ const HomePage = () => {
     setWorkoutStartTime(new Date());
     setNotes("");
 
-    var obj = {setName:"WeightTraining", exercises:exercises, userId:JSON.parse(localStorage.getItem('user_data')).id}; 
+    var obj = {setName:"NewWeightTraining", newSetName:"FinishedWeightTraining", exercises:exercises}; 
     var js = JSON.stringify(obj);
 
     try {
-      const response = await fetch('http://localhost:5000/api/create-set', {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
+      const response = await fetch('http://localhost:5000/api/update-set', {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
 
       var res = JSON.parse(await response.text());
 
       if (res.error.length <= 0) {
-        // Workout/set successfully stored
+        // Workout/set successfully updated
       }
       else {
         alert(res.error);
@@ -192,19 +233,60 @@ const HomePage = () => {
     setWorkoutHistory(updatedHistory);
   };
 
-  const handleStartCardioWorkout = () => {
+  const handleStartCardioWorkout = async (e) => {
+    e.preventDefault();
     setWorkoutInProgress(true);
     setWorkoutStartTime(new Date());
     setCardioExercises([]); // Reset cardio-specific exercises
     setNotes("");
+
+    var obj = {setName:"NewCardio", exercises:cardioExercises, userId:JSON.parse(localStorage.getItem('user_data')).id}; 
+    var js = JSON.stringify(obj);
+
+    try {
+      const response = await fetch('http://localhost:5000/api/create-set', {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
+
+      var res = JSON.parse(await response.text());
+
+      if (res.error.length <= 0) {
+        // Workout/set successfully created
+      }
+      else {
+        alert(res.error);
+      }
+    }
+    catch{
+      alert(e.toString);
+    }
   };
 
-  const handleCancelCardioWorkout = () => {
+  const handleCancelCardioWorkout = async(e) => {
+    e.preventDefault();
     if (window.confirm("Are you sure you want to cancel this workout? All progress will be lost.")) {
       setWorkoutInProgress(false);
       setCardioExercises([]); // Reset cardio-specific exercises
       setWorkoutStartTime(new Date());
       setNotes("");
+
+      var obj = {setName:"NewCardio"}; 
+      var js = JSON.stringify(obj);
+
+      try {
+        const response = await fetch('http://localhost:5000/api/delete-set', {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
+
+        var res = JSON.parse(await response.text());
+
+        if (res.error.length <= 0) {
+          // Workout/set successfully deleted
+          alert(res.message);
+        }
+        else {
+          alert(res.error);
+        }
+      }
+      catch{
+        alert(e.toString);
+      }
     }
   };
 
@@ -221,16 +303,16 @@ const HomePage = () => {
     setWorkoutStartTime(new Date());
     setNotes("");
 
-    var obj = {setName:"Cardio", exercises:cardioExercises, userId:JSON.parse(localStorage.getItem('user_data')).id}; 
+    var obj = {setName:"NewCardio", newSetName:"FinishedCardio", exercises:cardioExercises}; 
     var js = JSON.stringify(obj);
 
     try {
-      const response = await fetch('http://localhost:5000/api/create-set', {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
+      const response = await fetch('http://localhost:5000/api/update-set', {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
 
       var res = JSON.parse(await response.text());
 
       if (res.error.length <= 0) {
-        // Cardio workout/set successfully stored
+        // Cardio workout/set successfully updated
       }
       else {
         alert(res.error);
