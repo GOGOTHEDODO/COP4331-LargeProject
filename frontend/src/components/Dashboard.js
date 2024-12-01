@@ -73,7 +73,8 @@ const HomePage = () => {
     }
   };
 
-  const handleFinishWorkout = () => {
+  const handleFinishWorkout = async (e) => {
+    e.preventDefault();
     const completedWorkout = {
       time: workoutStartTime,
       exercises,
@@ -82,9 +83,29 @@ const HomePage = () => {
     setWorkoutHistory([...workoutHistory, completedWorkout]);
     alert("Workout completed!");
     setWorkoutInProgress(false);
-    setExercises([]);
     setWorkoutStartTime(new Date());
     setNotes("");
+
+    var obj = {setName:"WeightTraining", exercises:exercises, userId:JSON.parse(localStorage.getItem('user_data')).id}; 
+    var js = JSON.stringify(obj);
+
+    try {
+      const response = await fetch('http://localhost:5000/api/create-set', {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
+
+      var res = JSON.parse(await response.text());
+
+      if (res.error.length <= 0) {
+        // Workout/set successfully stored
+      }
+      else {
+        alert(res.error);
+      }
+    }
+    catch {
+      alert(e.toString);
+    }
+
+    setExercises([]);
   };
 
   const handleAddExercise = async (e) => {
@@ -187,7 +208,8 @@ const HomePage = () => {
     }
   };
 
-  const handleFinishCardioWorkout = () => {
+  const handleFinishCardioWorkout = async (e) => {
+    e.preventDefault();
     const completedWorkout = {
       time: workoutStartTime,
       exercises: cardioExercises,
@@ -196,9 +218,29 @@ const HomePage = () => {
     setCardioHistory([...cardioHistory, completedWorkout]); // Save to cardio-specific history
     alert("Cardio workout completed!");
     setWorkoutInProgress(false);
-    setCardioExercises([]); // Clear cardio-specific exercises
     setWorkoutStartTime(new Date());
     setNotes("");
+
+    var obj = {setName:"Cardio", exercises:cardioExercises, userId:JSON.parse(localStorage.getItem('user_data')).id}; 
+    var js = JSON.stringify(obj);
+
+    try {
+      const response = await fetch('http://localhost:5000/api/create-set', {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
+
+      var res = JSON.parse(await response.text());
+
+      if (res.error.length <= 0) {
+        // Cardio workout/set successfully stored
+      }
+      else {
+        alert(res.error);
+      }
+    }
+    catch {
+      alert(e.toString);
+    }
+
+    setCardioExercises([]); // Clear cardio-specific exercises
   };
 
   const handleAddCardioExercise = async (e) => {
