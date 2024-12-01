@@ -9,13 +9,34 @@ function Signup() {
   const [showModal, setShowModal] = useState(false); // Modal visibility state
   const navigate = useNavigate();
 
-  const handleSignup = (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
       alert('Passwords do not match!');
       return;
     }
-    setShowModal(true); // Show modal on successful signup
+
+    var obj = {login:email,password:password,firstname:'', lastname:''}; 
+    var js = JSON.stringify(obj);
+
+    try {
+      const response = await fetch('http://localhost:5000/api/signup', {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
+
+      var res = JSON.parse(await response.text());
+
+      if (res.error.length <= 0) {
+        setShowModal(true); // Show modal on successful signup
+      }
+      else {
+        alert(res.error);
+        return; // Invalid signup
+      }
+    }
+    catch {
+      alert(e.toString());
+      return; // Error
+    }
+    
   };
 
   const handleModalClose = () => {

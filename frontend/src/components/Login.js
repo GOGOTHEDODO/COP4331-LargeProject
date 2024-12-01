@@ -10,13 +10,32 @@ function Login() {
   const [showErrorModal, setShowErrorModal] = useState(false); // State for error modal visibility
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // Mock authentication
-    if (email === 'test@test.com' && password === 'password') {
-      setShowSuccessModal(true); // Show success modal on valid login
-    } else {
-      setShowErrorModal(true); // Show error modal on invalid login
+
+    var obj = {login:email,password:password};
+    var js = JSON.stringify(obj);
+
+    try {
+      const response = await fetch('http://localhost:5000/api/login', {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
+
+      var res = JSON.parse(await response.text());
+
+      if (res.id > 0) {
+        var user = {firstName:res.firstName,lastName:res.lastName,id:res.id}
+        localStorage.setItem('user_data', JSON.stringify(user));
+
+        setMessage('');
+
+        setShowSuccessModal(true); // Valid login, show success modal
+      }
+      else {
+        setShowErrorModal(true); // Invalid login, show error modal
+      }
+    }
+    catch (e) {
+      setShowErrorModal(true); // Error
+      return;
     }
   };
 
