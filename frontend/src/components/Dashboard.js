@@ -16,6 +16,8 @@ const HomePage = () => {
   const [workoutStartTime, setWorkoutStartTime] = useState(new Date());
   const [exercises, setExercises] = useState([]);
   const [currentExercise, setCurrentExercise] = useState("");
+  const [currentMuscleGroup, setCurrentMuscleGroup] = useState("");
+  const [currentEquipmentType, setCurrentEquipmentType] = useState("");
   const [notes, setNotes] = useState("");
   const [workoutHistory, setWorkoutHistory] = useState([]);
   const [cardioExercises, setCardioExercises] = useState([]);
@@ -23,6 +25,7 @@ const HomePage = () => {
   const [isEditingWorkout, setIsEditingWorkout] = useState(null); // Track if editing a workout
 
   const signOut = () => {
+    localStorage.removeItem("user_data");
     setIsSignedOut(true);
   };
 
@@ -84,7 +87,8 @@ const HomePage = () => {
     setNotes("");
   };
 
-  const handleAddExercise = () => {
+  const handleAddExercise = async (e) => {
+    e.preventDefault();
     if (!currentExercise.trim()) {
       alert("Please enter an exercise name.");
       return;
@@ -96,7 +100,29 @@ const HomePage = () => {
         sets: [],
       },
     ]);
+
+    var obj = {name:currentExercise.trim(), muscleGroup:currentMuscleGroup.trim(), equipmentType:currentEquipmentType.trim()};
+    var js = JSON.stringify(obj);
+
     setCurrentExercise("");
+    setCurrentMuscleGroup("");
+    setCurrentEquipmentType("");
+
+    try {
+      const response = await fetch('http://localhost:5000/api/create-exercise', {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
+
+      var res = JSON.parse(await response.text());
+
+      if (res.error.length <= 0) {
+        // Add Exercise is successful
+      }
+      else {
+        alert(res.error);
+      }
+    }
+    catch{
+      alert(e.toString());
+    }
   };
 
   const handleAddSet = (exerciseIndex) => {
@@ -175,7 +201,8 @@ const HomePage = () => {
     setNotes("");
   };
 
-  const handleAddCardioExercise = () => {
+  const handleAddCardioExercise = async (e) => {
+    e.preventDefault();
     if (!currentExercise.trim()) {
       alert("Please enter an exercise name.");
       return;
@@ -187,7 +214,29 @@ const HomePage = () => {
         sets: [],
       },
     ]);
+    
+    var obj = {name:currentExercise.trim(), muscleGroup:currentMuscleGroup.trim(), equipmentType:currentEquipmentType.trim()};
+    var js = JSON.stringify(obj);
+
     setCurrentExercise("");
+    setCurrentMuscleGroup("");
+    setCurrentEquipmentType("");
+
+    try {
+      const response = await fetch('http://localhost:5000/api/create-exercise', {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
+
+      var res = JSON.parse(await response.text());
+
+      if (res.error.length <= 0) {
+        // Add Cardio Exercise is successful
+      }
+      else {
+        alert(res.error);
+      }
+    }
+    catch{
+      alert(e.toString());
+    }
   };
 
   const handleAddCardioSet = (exerciseIndex) => {
@@ -355,6 +404,20 @@ const HomePage = () => {
                       onChange={(e) => setCurrentExercise(e.target.value)}
                       className="modern-input"
                     />
+                    <input
+                      type="text"
+                      placeholder="Muscle Group (e.g., Core)"
+                      value={currentMuscleGroup}
+                      onChange={(e) => setCurrentMuscleGroup(e.target.value)}
+                      className="modern-input"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Equipment Type (e.g., Barbells)"
+                      value={currentEquipmentType}
+                      onChange={(e) => setCurrentEquipmentType(e.target.value)}
+                      className="modern-input"
+                    />
                     <button
                       className="add-exercise-button modern-button"
                       onClick={handleAddExercise}
@@ -492,6 +555,20 @@ const HomePage = () => {
                       placeholder="Exercise Name (e.g., Run, Bike Ride)"
                       value={currentExercise}
                       onChange={(e) => setCurrentExercise(e.target.value)}
+                      className="modern-input"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Muscle Group (e.g., Legs)"
+                      value={currentMuscleGroup}
+                      onChange={(e) => setCurrentMuscleGroup(e.target.value)}
+                      className="modern-input"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Equipment Type (e.g., Body, Bike)"
+                      value={currentEquipmentType}
+                      onChange={(e) => setCurrentEquipmentType(e.target.value)}
                       className="modern-input"
                     />
                     <button
