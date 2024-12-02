@@ -6,7 +6,7 @@ function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [firstname, setFirstName] = useState('');
-  const [lastname, setlastName] = useState('');
+  const [lastname, setLastName] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showModal, setShowModal] = useState(false); // Modal visibility state
   const navigate = useNavigate();
