@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import "../styles/Dashboard.css";
@@ -23,6 +23,38 @@ const HomePage = () => {
   const [cardioExercises, setCardioExercises] = useState([]);
   const [cardioHistory, setCardioHistory] = useState([]);
   const [isEditingWorkout, setIsEditingWorkout] = useState(null); // Track if editing a workout
+
+
+  // load data from localStorage on mount
+  useEffect(() => {
+    const savedWorkoutHistory = JSON.parse(localStorage.getItem("workoutHistory")) || [];
+    setWorkoutHistory(savedWorkoutHistory);
+
+
+    const savedCardioHistory = JSON.parse(localStorage.getItem("cardioHistory")) || [];
+    setCardioHistory(savedCardioHistory);
+  }, []);
+
+  // save data to localStorage on state change
+  useEffect(() => {
+    localStorage.setItem("workoutHistory", JSON.stringify(workoutHistory));
+  }, [workoutHistory]);
+
+  useEffect(() => {
+    localStorage.setItem("cardioHistory", JSON.stringify(cardioHistory));
+  }, [cardioHistory]);
+
+
+ /*useEffect(() => {
+  const savedStartingWeight = Number(localStorage.getItem("startingWeight")) || 70; // Default 70
+  setStartingWeight(savedStartingWeight);
+
+  const savedCurrentUserWeight = Number(localStorage.getItem("currentUserWeight")) || 70; // Default 70
+  setCurrentUserWeight(savedCurrentUserWeight);
+
+  const savedNewWeightInput = localStorage.getItem("newWeightInput") || "";
+  setNewWeightInput(savedNewWeightInput);
+}, []); */
 
   const signOut = () => {
     localStorage.removeItem("user_data");
@@ -64,7 +96,7 @@ const HomePage = () => {
     setExercises([]);
     setNotes("");
 
-    var obj = {setName:"NewWeightTraining", exercises:exercises, userId:JSON.parse(localStorage.getItem('user_data')).id}; 
+    var obj = {setName:"NewWeightTraining", exercises:exercises, userId:JSON.parse(localStorage.getItem('user_data')).id};
     var js = JSON.stringify(obj);
 
     try {
@@ -92,14 +124,14 @@ const HomePage = () => {
       setWorkoutStartTime(new Date());
       setNotes("");
 
-      var obj = {setName:"NewWeightTraining"}; 
+      var obj = {setName:"NewWeightTraining"};
       var js = JSON.stringify(obj);
 
       try {
         const response = await fetch('https://largeproject.mattct027.xyz/api/delete-set', {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
-  
+
         var res = JSON.parse(await response.text());
-  
+
         if (res.error.length <= 0) {
           // Workout/set successfully deleted
           alert(res.message);
@@ -127,7 +159,7 @@ const HomePage = () => {
     setWorkoutStartTime(new Date());
     setNotes("");
 
-    var obj = {setName:"NewWeightTraining", newSetName:"FinishedWeightTraining", exercises:exercises}; 
+    var obj = {setName:"NewWeightTraining", newSetName:"FinishedWeightTraining", exercises:exercises};
     var js = JSON.stringify(obj);
 
     try {
@@ -240,7 +272,7 @@ const HomePage = () => {
     setCardioExercises([]); // Reset cardio-specific exercises
     setNotes("");
 
-    var obj = {setName:"NewCardio", exercises:cardioExercises, userId:JSON.parse(localStorage.getItem('user_data')).id}; 
+    var obj = {setName:"NewCardio", exercises:cardioExercises, userId:JSON.parse(localStorage.getItem('user_data')).id};
     var js = JSON.stringify(obj);
 
     try {
@@ -268,7 +300,7 @@ const HomePage = () => {
       setWorkoutStartTime(new Date());
       setNotes("");
 
-      var obj = {setName:"NewCardio"}; 
+      var obj = {setName:"NewCardio"};
       var js = JSON.stringify(obj);
 
       try {
@@ -291,7 +323,7 @@ const HomePage = () => {
   };
 
   const handleFinishCardioWorkout = async (e) => {
-    e.preventDefault();
+    //e.preventDefault();
     const completedWorkout = {
       time: workoutStartTime,
       exercises: cardioExercises,
@@ -303,7 +335,7 @@ const HomePage = () => {
     setWorkoutStartTime(new Date());
     setNotes("");
 
-    var obj = {setName:"NewCardio", newSetName:"FinishedCardio", exercises:cardioExercises}; 
+    var obj = {setName:"NewCardio", newSetName:"FinishedCardio", exercises:cardioExercises};
     var js = JSON.stringify(obj);
 
     try {
@@ -338,7 +370,7 @@ const HomePage = () => {
         sets: [],
       },
     ]);
-    
+
     var obj = {name:currentExercise.trim(), muscleGroup:currentMuscleGroup.trim(), equipmentType:currentEquipmentType.trim()};
     var js = JSON.stringify(obj);
 
@@ -379,7 +411,7 @@ const HomePage = () => {
     const updatedExercises = [...cardioExercises];
     updatedExercises[exerciseIndex].sets[setIndex][field] = value;
     setCardioExercises(updatedExercises);
-  };  
+  };
 
   const handleEditCardioWorkout = (index) => {
     const workoutToEdit = cardioHistory[index];
@@ -389,7 +421,7 @@ const HomePage = () => {
     setNotes(workoutToEdit.notes);
     setIsEditingWorkout(index); // Set editing index
   };
-  
+
   const handleSaveEditedCardioWorkout = () => {
     const updatedHistory = [...cardioHistory];
     updatedHistory[isEditingWorkout] = {
@@ -402,13 +434,13 @@ const HomePage = () => {
     setWorkoutInProgress(false);
     alert("Cardio workout updated successfully!");
   };
-  
+
   const handleEditCardioWorkoutTime = (index, newTime) => {
     const updatedHistory = [...cardioHistory];
     updatedHistory[index].time = new Date(newTime);
     setCardioHistory(updatedHistory);
-  };  
-  
+  };
+
   if (isSignedOut) {
     return <Home />;
   }
