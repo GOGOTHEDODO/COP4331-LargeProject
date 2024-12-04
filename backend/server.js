@@ -1,4 +1,4 @@
- const express = require('express');
+const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
@@ -110,7 +110,7 @@ app.post('/api/login', async (req, res, next) => {
     var ln = '';
 
     if (results.length > 0) {
-        id = results[0].UserId;
+        id = results[0]._id;
         fn = results[0].FirstName;
         ln = results[0].LastName;
     }
@@ -152,7 +152,7 @@ app.post('/api/retrieve-exercise', async (req, res, next) => {
     res.status(200).json(ret);
 });
 
-app.post('/api/retrieve-set', async (req, res, next) => {
+/*app.post('/api/retrieve-set', async (req, res, next) => {
     let error = '';
 
     const { setName } = req.body;
@@ -186,7 +186,33 @@ app.post('/api/retrieve-set', async (req, res, next) => {
         error = e.toString();
         res.status(500).json({ error });
     }
+}); */
+
+app.post('/api/retrieve-set', async (req, res, next) => {
+    let error = '';
+
+    const { userId } = req.body;
+
+    if (!userId) {
+        error = 'User ID is required';
+        return res.status(400).json({ error });
+    }
+
+    try {
+        const db = client.db();
+        const results = await db.collection('Sets').find({ UserId: new ObjectId(userId) }).toArray();
+
+        if (results.length === 0) {
+            error = 'No sets found for this user';
+        }
+
+        res.status(200).json({ sets: results, error });
+    } catch (e) {
+        error = e.toString();
+        res.status(500).json({ error });
+    }
 });
+
 
 //Update
 
@@ -322,7 +348,5 @@ app.post('/api/delete-exercise', async (req, res, next) => {
         res.status(500).json({ error });
     }
 });
-
-
 
 app.listen(5000);
