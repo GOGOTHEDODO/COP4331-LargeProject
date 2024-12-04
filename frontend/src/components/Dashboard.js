@@ -21,6 +21,7 @@ const HomePage = () => {
   const [currentExercise, setCurrentExercise] = useState("");
   const [currentMuscleGroup, setCurrentMuscleGroup] = useState("");
   const [currentEquipmentType, setCurrentEquipmentType] = useState("");
+  const [workoutName, setWorkoutName] = useState("");
   const [notes, setNotes] = useState("");
   const [workoutHistory, setWorkoutHistory] = useState([]);
   const [cardioExercises, setCardioExercises] = useState([]);
@@ -176,11 +177,22 @@ const HomePage = () => {
 
   const handleFinishWorkout = async (e) => {
       e.preventDefault();
+
+      const name = prompt("Please enter a name for your workout:");
+
+      if (!name) {
+          alert("Workout name is required.");
+          return;
+      }
+
       const completedWorkout = {
-          time: workoutStartTime,
-          exercises,
-          notes,
-      };
+        name: name,
+        time: workoutStartTime,
+        exercises,
+        notes,
+    };
+  
+      setWorkoutName(name); // Save the workout name in state
       setWorkoutHistory([...workoutHistory, completedWorkout]);
       alert("Workout completed!");
       setWorkoutInProgress(false);
@@ -189,7 +201,7 @@ const HomePage = () => {
 
       var obj = {
           setName: "NewWeightTraining",
-          newSetName: "FinishedWeightTraining",
+          newSetName: name,
           exercises: exercises
       };
       var js = JSON.stringify(obj);
@@ -385,11 +397,21 @@ const HomePage = () => {
 
   const handleFinishCardioWorkout = async (e) => {
       //e.preventDefault();
+      const name = prompt("Please enter a name for your workout:");
+
+      if (!name) {
+          alert("Workout name is required.");
+          return;
+      }
+
       const completedWorkout = {
-          time: workoutStartTime,
-          exercises: cardioExercises,
-          notes,
+        name: name,
+        time: workoutStartTime,
+        exercises: cardioExercises,
+        notes,
       };
+
+      setWorkoutName(name); // Save the workout name in state
       setCardioHistory([...cardioHistory, completedWorkout]); // Save to cardio-specific history
       alert("Cardio workout completed!");
       setWorkoutInProgress(false);
@@ -398,7 +420,7 @@ const HomePage = () => {
 
       var obj = {
           setName: "NewCardio",
-          newSetName: "FinishedCardio",
+          newSetName: name,
           exercises: cardioExercises
       };
       var js = JSON.stringify(obj);
@@ -519,6 +541,80 @@ const HomePage = () => {
       const updatedHistory = [...cardioHistory];
       updatedHistory[index].time = new Date(newTime);
       setCardioHistory(updatedHistory);
+  };
+
+  const handleDeleteWorkout = async (index) => {
+    const updatedWorkouts = [...workoutHistory];
+    const workoutToDelete = updatedWorkouts[index].setName || updatedWorkouts[index].name;
+
+    var obj = {
+      setName: workoutToDelete
+    };
+    var js = JSON.stringify(obj);
+
+    try {
+        const response = await fetch('https://largeproject.mattct027.xyz/api/delete-set', {
+            method: 'POST',
+            body: js,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        var res = JSON.parse(await response.text());
+
+        if (res.error.length <= 0) {
+            // Workout/set successfully deleted
+            alert(res.message);
+        } else {
+            alert(res.error);
+        }
+    } catch {
+        alert("Caught error");
+    }
+
+    updatedWorkouts.splice(index, 1); // Remove the workout at the given index
+    setWorkoutHistory(updatedWorkouts); // Update the state
+
+    // Update localStorage
+    localStorage.setItem("workoutHistory", JSON.stringify(updatedWorkouts));
+  };
+
+  const handleDeleteCardioWorkout = async (index) => {
+    const updatedCardioWorkouts = [...cardioHistory];
+    const cardioToDelete = updatedCardioWorkouts[index].setName || updatedCardioWorkouts[index].name;
+
+    var obj = {
+      setName: cardioToDelete
+    };
+    var js = JSON.stringify(obj);
+
+    try {
+        const response = await fetch('https://largeproject.mattct027.xyz/api/delete-set', {
+            method: 'POST',
+            body: js,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        var res = JSON.parse(await response.text());
+
+        if (res.error.length <= 0) {
+            // Workout/set successfully deleted
+            alert(res.message);
+        } else {
+            alert(res.error);
+        }
+    } catch {
+        alert("Caught error");
+    }
+
+    updatedCardioWorkouts.splice(index, 1); // Remove the cardio workout at the given index
+    setCardioHistory(updatedCardioWorkouts); // Update the state
+
+    // Update localStorage
+    localStorage.setItem("cardioHistory", JSON.stringify(updatedCardioWorkouts));
   };
 
   if (isSignedOut) {
@@ -762,6 +858,12 @@ const HomePage = () => {
                     >
                       Edit Workout
                     </button>
+                    <button
+                      className="log-button delete-button"
+                      onClick={() => handleDeleteWorkout(index)}
+                    >
+                      Delete Workout
+                  </button>
                   </div>
                 ))}
               </div>
@@ -910,6 +1012,12 @@ const HomePage = () => {
                     onClick={() => handleEditCardioWorkout(index)}
                   >
                     Edit Workout
+                  </button>
+                  <button
+                    className="log-button delete-button"
+                    onClick={() => handleDeleteCardioWorkout(index)}
+                  >
+                    Delete Workout
                   </button>
                 </div>
               ))}
